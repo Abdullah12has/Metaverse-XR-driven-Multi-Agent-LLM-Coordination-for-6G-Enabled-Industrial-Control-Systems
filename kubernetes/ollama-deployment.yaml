@@ -14,8 +14,8 @@ spec:
     spec:
       containers:
         - name: ollama
-          image: my-ollama:latest # 
-          imagePullPolicy: Never  #
+          image: abdullah122/ollama:latest  # ✅ Updated to Docker Hub image
+          imagePullPolicy: Always  # ✅ Ensures Kubernetes pulls the latest image
           ports:
             - containerPort: 11434
           volumeMounts:
@@ -25,14 +25,14 @@ spec:
             httpGet:
               path: /api/version
               port: 11434
-            initialDelaySeconds: 60  # 
-            periodSeconds: 30
+            initialDelaySeconds: 30  # ⬇️ Reduced to check earlier
+            periodSeconds: 15
           readinessProbe:
             httpGet:
               path: /api/version
               port: 11434
-            initialDelaySeconds: 30  # ⬇️ Reduced to check sooner
-            periodSeconds: 15
+            initialDelaySeconds: 15  # ⬇️ Reduced to check sooner
+            periodSeconds: 10
       volumes:
         - name: ollama-storage
           persistentVolumeClaim:

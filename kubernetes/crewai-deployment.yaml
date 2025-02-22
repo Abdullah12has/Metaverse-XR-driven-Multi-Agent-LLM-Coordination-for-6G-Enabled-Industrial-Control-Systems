@@ -14,12 +14,24 @@ spec:
     spec:
       containers:
         - name: crewai
-          image: crewai:latest  # Using locally built image
-          imagePullPolicy: Never  # Prevent Kubernetes from pulling from Docker Hub
+          image: abdullah122/crewai:latest  # ✅ Updated to Docker Hub image
+          imagePullPolicy: Always  # ✅ Ensures Kubernetes pulls the latest image
           ports:
             - containerPort: 5000
           env:
             - name: OLLAMA_API_BASE
               value: "http://ollama:11434"
           command: ["python3", "api.py"]
+          livenessProbe:  # ✅ Added to ensure the app is running
+            httpGet:
+              path: /health  # Update if your app has a health endpoint
+              port: 5000
+            initialDelaySeconds: 30
+            periodSeconds: 15
+          readinessProbe:  # ✅ Ensures the app is ready before accepting traffic
+            httpGet:
+              path: /health  # Update if needed
+              port: 5000
+            initialDelaySeconds: 15
+            periodSeconds: 10
       restartPolicy: Always  # Ensures the container restarts if it crashes
