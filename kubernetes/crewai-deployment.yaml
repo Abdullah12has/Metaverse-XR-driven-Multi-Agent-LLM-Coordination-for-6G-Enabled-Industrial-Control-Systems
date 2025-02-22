@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: crewai
-          image: abdullah122/crewai:latest  # ✅ Updated to Docker Hub image
+          image: abdullah122/crewai_app:latest  # ✅ Updated to Docker Hub image
           imagePullPolicy: Always  # ✅ Ensures Kubernetes pulls the latest image
           ports:
             - containerPort: 5000
