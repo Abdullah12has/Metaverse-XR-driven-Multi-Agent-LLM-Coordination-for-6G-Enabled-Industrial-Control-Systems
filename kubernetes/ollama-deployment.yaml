@@ -14,8 +14,8 @@ spec:
     spec:
       containers:
         - name: ollama
-          image: abdullah122/ollama:latest  # ✅ Updated to Docker Hub image
-          imagePullPolicy: Always  # ✅ Ensures Kubernetes pulls the latest image
+          image: abdullah122/ollama:latest  
+          imagePullPolicy: Always 
           ports:
             - containerPort: 11434
           volumeMounts:
