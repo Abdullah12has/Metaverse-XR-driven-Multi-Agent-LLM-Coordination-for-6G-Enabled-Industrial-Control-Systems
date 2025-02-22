@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crewai-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: crewai
+  template:
+    metadata:
+      labels:
+        app: crewai
+    spec:
+      containers:
+        - name: crewai
+          image: crewai:latest  # Using locally built image
+          imagePullPolicy: Never  # Prevent Kubernetes from pulling from Docker Hub
+          ports:
+            - containerPort: 5000
+          env:
+            - name: OLLAMA_API_BASE
+              value: "http://ollama:11434"
+          command: ["python3", "api.py"]
+      restartPolicy: Always  # Ensures the container restarts if it crashes
