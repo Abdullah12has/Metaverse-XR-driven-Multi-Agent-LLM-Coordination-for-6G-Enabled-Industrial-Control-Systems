@@ -90,6 +90,9 @@ docker build -t server:latest -f server/Dockerfile server
 
 # Build client image
 docker build -t client:latest -f client/Dockerfile client
+
+docker build -t crewai_app:latest -f src/icsagents/Dockerfile src/icsagents
+
 ```
 
 ### Kubernetes Deployment

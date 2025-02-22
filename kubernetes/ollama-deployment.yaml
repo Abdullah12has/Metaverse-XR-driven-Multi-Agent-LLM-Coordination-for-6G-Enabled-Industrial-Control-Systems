@@ -14,8 +14,8 @@ spec:
     spec:
       containers:
         - name: ollama
-          image: abdullah122/ollama:latest  
-          imagePullPolicy: Always 
+          image: ollama/ollama:latest  
+          imagePullPolicy: Always  
           ports:
             - containerPort: 11434
           volumeMounts:
@@ -25,13 +25,13 @@ spec:
             httpGet:
               path: /api/version
               port: 11434
-            initialDelaySeconds: 30  # ⬇️ Reduced to check earlier
+            initialDelaySeconds: 30 
             periodSeconds: 15
           readinessProbe:
             httpGet:
               path: /api/version
               port: 11434
-            initialDelaySeconds: 15  # ⬇️ Reduced to check sooner
+            initialDelaySeconds: 15  
             periodSeconds: 10
       volumes:
         - name: ollama-storage

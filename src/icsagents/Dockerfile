@@ -5,7 +5,7 @@ FROM python:3.10
 WORKDIR /app
 
 # Copy the application files into the container
-COPY . /app
+COPY . .
 
 # Install dependencies
 RUN pip install --no-cache-dir crewai crewai-tools requests flask flask-cors flask-restful
