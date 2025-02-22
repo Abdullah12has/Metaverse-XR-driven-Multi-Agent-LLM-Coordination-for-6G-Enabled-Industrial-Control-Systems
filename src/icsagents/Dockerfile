@@ -9,7 +9,7 @@ COPY . /app
 
 # Install dependencies
 RUN pip install --no-cache-dir crewai crewai-tools requests flask flask-cors flask-restful
-COPY .env .env
+# COPY .env .env
 # Set environment variable to point to Ollama service
 ENV OLLAMA_API_BASE="http://ollama:11434"
 
