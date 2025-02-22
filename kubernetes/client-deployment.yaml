@@ -3,6 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: client
+  namespace: myapp  
 spec:
   replicas: 3  # Adjust as needed
   selector:
