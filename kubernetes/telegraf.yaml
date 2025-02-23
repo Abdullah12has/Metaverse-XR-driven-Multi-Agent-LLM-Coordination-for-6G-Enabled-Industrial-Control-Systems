@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: telegraf
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: telegraf
+  template:
+    metadata:
+      labels:
+        app: telegraf
+    spec:
+      containers:
+        - name: telegraf
+          image: telegraf:1.28  # Using a specific version instead of latest
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          volumeMounts:
+            - name: telegraf-config-volume
+              mountPath: /etc/telegraf  # Mounting the directory, not the file
+          env:
+            - name: KAFKA_CONSUMER_GROUP
+              value: "telegraf-consumer-group"
+      volumes:
+        - name: telegraf-config-volume
+          configMap:
+            name: telegraf-config
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: telegraf-config
+  namespace: monitoring
+data:
+  telegraf.conf: |
+    [agent]
+      debug = true
+      quiet = false
+      interval = "10s"
+      flush_interval = "10s"
+
+    [[inputs.kafka_consumer]]
+      ## Kafka brokers
+      brokers = ["kafka.default.svc.cluster.local:9092"]
+      
+      ## Topics to consume
+      topics = ["sensor_topic"]
+      
+      ## Consumer group settings
+      consumer_group = "telegraf-consumer-group"
+      
+      ## Initial offset position: newest or oldest
+      offset = "oldest"  # Changed from "earliest" to "oldest"
+      
+      ## Message parsing format
+      data_format = "json"
+      
+      ## Additional consumer configurations for reliability
+      max_message_len = 1000000
+      max_processing_time = "1s"
+      max_undelivered_messages = 1000
+
+    [[outputs.influxdb_v2]]
+      urls = ["http://influxdb.monitoring.svc.cluster.local:8086"]
+      token = "my-secret-token"
+      organization = "my-org"
+      bucket = "my-bucket"
+      timeout = "10s"
