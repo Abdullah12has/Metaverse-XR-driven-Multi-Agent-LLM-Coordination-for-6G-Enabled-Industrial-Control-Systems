@@ -7,6 +7,7 @@ import time
 from main import run
 from functools import wraps
 from datetime import datetime
+from influxdb_client import InfluxDBClient, Point, WritePrecision
 
 app = Flask(__name__)
 
@@ -18,12 +19,17 @@ handler.setFormatter(logging.Formatter(
 ))
 app.logger.addHandler(handler)
 
-# Dictionary to store job results with cleanup
+# InfluxDB Configuration
+INFLUXDB_URL = "http://influxdb.monitoring.svc.cluster.local:8086"
+INFLUXDB_TOKEN = "my-secret-token"
+INFLUXDB_ORG = "my-org"
+
+# Dictionary to store job results
 class JobStore:
     def __init__(self):
         self.jobs = {}
         self.lock = threading.Lock()
-        
+
     def add_job(self, job_id, status="processing"):
         with self.lock:
             self.jobs[job_id] = {
@@ -31,33 +37,30 @@ class JobStore:
                 "created_at": datetime.utcnow().isoformat(),
                 "updated_at": datetime.utcnow().isoformat()
             }
-    
+
     def update_job(self, job_id, data):
         with self.lock:
             if job_id in self.jobs:
                 self.jobs[job_id].update(data)
                 self.jobs[job_id]["updated_at"] = datetime.utcnow().isoformat()
-    
+
     def get_job(self, job_id):
         with self.lock:
             return self.jobs.get(job_id)
-    
+
     def cleanup_old_jobs(self, max_age_hours=24):
         with self.lock:
             current_time = datetime.utcnow()
-            to_delete = []
-            for job_id, job_data in self.jobs.items():
-                created_at = datetime.fromisoformat(job_data['created_at'])
-                age = (current_time - created_at).total_seconds() / 3600
-                if age > max_age_hours:
-                    to_delete.append(job_id)
-            
+            to_delete = [
+                job_id for job_id, job_data in self.jobs.items()
+                if (current_time - datetime.fromisoformat(job_data['created_at'])).total_seconds() / 3600 > max_age_hours
+            ]
             for job_id in to_delete:
                 del self.jobs[job_id]
 
 job_store = JobStore()
 
-# Middleware for request validation
+# Middleware for JSON validation
 def validate_json():
     def decorator(f):
         @wraps(f)
@@ -72,22 +75,22 @@ def run_multiagent_async(job_id, input_data):
     """Runs the multi-agent process asynchronously and stores the result."""
     try:
         app.logger.info(f"Starting job {job_id} with data: {input_data}")
-        
+
         # Record start time
         start_time = time.time()
-        
+
         # Call the multi-agent function with dynamic inputs
         result = run(input_data)
-        
+
         # Calculate execution time
         execution_time = time.time() - start_time
-        
+
         job_store.update_job(job_id, {
             "status": "completed",
             "result": result,
             "execution_time": f"{execution_time:.2f} seconds"
         })
-        
+
     except Exception as e:
         app.logger.error(f"Error in job {job_id}: {str(e)}", exc_info=True)
         job_store.update_job(job_id, {
@@ -97,26 +100,34 @@ def run_multiagent_async(job_id, input_data):
 
 @app.route('/health', methods=['GET'])
 def health_check():
-    """Health check endpoint."""
+    """Health check endpoint for the Flask app."""
     return jsonify({
         "status": "healthy",
         "timestamp": datetime.utcnow().isoformat()
     })
+
+@app.route('/influxdb/health', methods=['GET'])
+def influxdb_health():
+    """Check if InfluxDB is reachable."""
+    try:
+        client = InfluxDBClient(url=INFLUXDB_URL, token=INFLUXDB_TOKEN, org=INFLUXDB_ORG)
+        health = client.health()
+        return jsonify({"status": health.status})
+    except Exception as e:
+        return jsonify({"error": "InfluxDB is unreachable", "details": str(e)}), 500
 
 @app.route('/run', methods=['POST'])
 @validate_json()
 def run_multiagent():
     try:
         data = request.json
-        
-        # Validate required fields
         if not data:
             return jsonify({"error": "Request body cannot be empty"}), 400
-        
+
         # Generate job ID and store initial status
         job_id = str(uuid.uuid4())
         job_store.add_job(job_id)
-        
+
         # Start the process in a separate thread
         thread = threading.Thread(
             target=run_multiagent_async,
@@ -124,12 +135,12 @@ def run_multiagent():
             daemon=True
         )
         thread.start()
-        
+
         return jsonify({
             "message": "Multi-agent system started",
             "job_id": job_id
         }), 202
-        
+
     except Exception as e:
         app.logger.error(f"Error occurred: {str(e)}", exc_info=True)
         return jsonify({"error": str(e)}), 500
@@ -150,6 +161,41 @@ def list_jobs():
             "total_jobs": len(job_store.jobs),
             "jobs": job_store.jobs
         })
+
+@app.route('/influxdb/query', methods=['POST'])
+@validate_json()
+def query_influxdb():
+    """Query InfluxDB and return the results."""
+    try:
+        data = request.json
+        query = data.get('query')
+
+        if not query:
+            return jsonify({"error": "Query parameter is required"}), 400
+
+        # Connect to InfluxDB
+        try:
+            client = InfluxDBClient(url=INFLUXDB_URL, token=INFLUXDB_TOKEN, org=INFLUXDB_ORG)
+            query_api = client.query_api()
+        except Exception as e:
+            app.logger.error(f"Failed to connect to InfluxDB: {str(e)}")
+            return jsonify({"error": "InfluxDB connection failed"}), 500
+
+        # Execute the query
+        result = query_api.query_flux(query)
+
+        # Process the result into a clean JSON response
+        results = [
+            {key: record[key] for key in record.values.keys()} 
+            for table in result 
+            for record in table.records
+        ]
+
+        return jsonify({"results": results})
+
+    except Exception as e:
+        app.logger.error(f"Error querying InfluxDB: {str(e)}", exc_info=True)
+        return jsonify({"error": str(e)}), 500
 
 # Error handlers
 @app.errorhandler(404)
@@ -174,6 +220,6 @@ if __name__ == '__main__':
         daemon=True
     )
     cleanup_thread.start()
-    
-    # Run the Flask app
+
+    # Run the Flask app with Gunicorn in production
     app.run(host='0.0.0.0', port=5000, debug=False, threaded=True)
