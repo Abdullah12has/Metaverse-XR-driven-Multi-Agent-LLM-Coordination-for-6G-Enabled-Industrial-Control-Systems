@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: open-webui
+spec:
+  selector:
+    app: open-webui
+  ports:
+    - name: http  # ✅ Added a unique name for port 3000
+      protocol: TCP
+      port: 3000
+      targetPort: 3000
+    - name: api  # ✅ Added a unique name for port 8080
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+  type: LoadBalancer

@@ -1,0 +1,76 @@
+# research_task:
+#   description: >
+#     Conduct a thorough research about {topic}
+#     Make sure you find any interesting and relevant information given
+#     the current year is {current_year}.
+#   expected_output: >
+#     A list with 10 bullet points of the most relevant information about {topic}
+#   agent: researcher
+
+# reporting_task:
+#   description: >
+#     Review the context you got and expand each topic into a full section for a report.
+#     Make sure the report is detailed and contains any and all relevant information.
+#   expected_output: >
+#     A fully fledged report with the main topics, each with a full section of information.
+#     Formatted as markdown without '```'
+#   agent: reporting_analyst
+
+
+
+problem_breakdown_task:
+  description: >
+    Read the problems.txt file. Break down the given mathematical problem into smaller, logical steps.
+    Identify key concepts, equations, and methods needed to solve it.
+    Ensure each step is clear and well-structured.
+    problems:
+    title: "State Space and Sensor Readings"
+    points: 20
+    description: >
+      Consider the state space X = R^3. There are two beacons:
+      - b1 = (0, 0, 0)
+      - b2 = (0, 0, 6)
+      Sensors h1 and h2 measure the Euclidean distance from a point x = (x1, x2, x3) to each beacon.
+      - h1(x) = ||x - b1||
+      - h2(x) = ||x - b2||
+    tasks:
+      - part: a
+        question: "What are the preimages for each sensor?"
+      - part: b
+        question: "Compute the sensor readings y1 and y2 at x = (6, 0, 0)."
+      - part: c
+        question: >
+          Given observations (y1, y2) = (3, sqrt(45)), describe the preimages h^(-1)(y1) and h^(-1)(y2),
+          and their intersection, representing the set of all states that could have produced these observations.
+  expected_output: >
+    A structured breakdown of the problem, listing relevant mathematical concepts, equations, and step-by-step reasoning.
+  agent: math_researcher
+
+solution_generation_task:
+  description: >
+    Using the structured breakdown, provide a detailed solution for the problem.
+    Clearly explain each step, justify assumptions, and verify the correctness of the solution.
+    If multiple methods exist, compare and contrast them.
+    problems:
+    title: "State Space and Sensor Readings"
+    points: 20
+    description: >
+      Consider the state space X = R^3. There are two beacons:
+      - b1 = (0, 0, 0)
+      - b2 = (0, 0, 6)
+      Sensors h1 and h2 measure the Euclidean distance from a point x = (x1, x2, x3) to each beacon.
+      - h1(x) = ||x - b1||
+      - h2(x) = ||x - b2||
+    tasks:
+      - part: a
+        question: "What are the preimages for each sensor?"
+      - part: b
+        question: "Compute the sensor readings y1 and y2 at x = (6, 0, 0)."
+      - part: c
+        question: >
+          Given observations (y1, y2) = (3, sqrt(45)), describe the preimages h^(-1)(y1) and h^(-1)(y2),
+          and their intersection, representing the set of all states that could have produced these observations.
+  expected_output: >
+    A fully solved problem with clear explanations, step-by-step calculations, and final results.
+    Formatted in Markdown without '```'.
+  agent: math_analyst
