@@ -2,7 +2,7 @@ import grpc
 import conveyor_pb2
 import conveyor_pb2_grpc
 import time
-from conveyor import ConveyorBelt
+from client.conveyor import ConveyorBelt
 
 def run():
     # Initialize conveyor system and gRPC client

@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package conveyor;
+
+message SensorData {
+    float time = 1;
+    float speed = 2;  // Conveyor speed (m/s)
+    float voltage = 3;  // Motor voltage (V)
+    float load = 4;  // Conveyor load (kg)
+    float current = 5;  // Motor current (A)
+    float power = 6;  // Power (W)
+    float rpm = 7;  // Motor RPM
+    float motor_torque = 8;  // Motor torque (N.m)
+    float efficiency = 9;  // Efficiency percentage
+    int64 lamport_time = 10;
+}
+
+message OptimizedSettings {
+    float new_speed = 1;  // New speed (m/s)
+    float new_voltage = 2;  // New voltage (V)
+    float new_pid_kp = 3;  // PID tuning Kp
+    float new_pid_ki = 4;  // PID tuning Ki
+    float new_pid_kd = 5;  // PID tuning Kd
+}
+
+service ConveyorService {
+    rpc GetOptimizedSettings(SensorData) returns (OptimizedSettings);
+}

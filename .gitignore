@@ -14,7 +14,6 @@ ENV/
 Pipfile
 Pipfile.lock
 poetry.lock
-requirements.txt
 
 # Distribution / packaging
 build/
