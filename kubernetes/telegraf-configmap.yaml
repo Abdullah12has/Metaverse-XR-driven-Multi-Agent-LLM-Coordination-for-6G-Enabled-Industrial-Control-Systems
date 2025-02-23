@@ -6,9 +6,8 @@ metadata:
 data:
   telegraf.conf: |
     [[inputs.kafka_consumer]]
-      brokers = ["localhost:9092"]
+      brokers = ["kafka.default.svc.cluster.local:9092"]
       topics = ["sensor_topic"]
-      group_id = "telegraf-consumer"
       offset = "oldest"
       data_format = "json"
 
