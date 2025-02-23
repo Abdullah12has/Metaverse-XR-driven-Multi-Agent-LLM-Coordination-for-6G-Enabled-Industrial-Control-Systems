@@ -150,20 +150,32 @@ class ICUOptimizationCrew(CrewBase):
             process=Process.sequential,
             verbose=True
         )
-
-    def train(self, training_file: str) -> None:
+    
+    
+def train(self, training_file: str, n_iterations: int = 2, model_file: str = "icu_crew_model.pkl") -> None:
         """
-        Train the crew using historical data from a text file.
+        Train the crew using historical data and save the trained model.
         
         Args:
             training_file (str): Path to training data file
+            n_iterations (int): Number of training iterations (default: 2)
+            model_file (str): Filename to save the trained model (must end with .pkl)
+            
+        Raises:
+            ValueError: If n_iterations is not positive or if model_file doesn't end with .pkl
         """
+        # Validate inputs
+        if not isinstance(n_iterations, int) or n_iterations <= 0:
+            raise ValueError("n_iterations must be a positive integer")
+            
+        if not model_file.endswith('.pkl'):
+            raise ValueError("model_file must end with .pkl")
+            
         try:
-            # Load historical data
+            # Load and parse training data
             with open(training_file, 'r') as f:
                 training_data = f.readlines()
             
-            # Parse and structure training data
             parsed_data = []
             for line in training_data:
                 try:
@@ -172,21 +184,28 @@ class ICUOptimizationCrew(CrewBase):
                 except json.JSONDecodeError:
                     logger.warning(f"Skipping invalid data line: {line}")
             
-            # Convert to DataFrame for easier processing
-            df = pd.DataFrame(parsed_data)
+            # Prepare training inputs
+            training_inputs = {
+                "topic": "ICU Optimization",
+                "data": parsed_data
+            }
             
-            logger.info(f"Training crew on {len(df)} historical data points")
+            logger.info(f"Starting crew training with {n_iterations} iterations")
             
-            # Use CrewAI's train function for each agent
-            self.sensor_analyst().train(df)
-            self.optimization_engineer().train(df)
-            self.validation_expert().train(df)
+            # Train the crew using CrewAI's built-in training method
+            self.crew().train(
+                n_iterations=n_iterations,
+                inputs=training_inputs,
+                filename=model_file
+            )
             
-            logger.info("Training completed successfully")
+            logger.info(f"Training completed successfully. Model saved to {model_file}")
             
         except Exception as e:
-            logger.error(f"Training error: {str(e)}")
-            raise
+            error_msg = f"An error occurred while training the crew: {str(e)}"
+            logger.error(error_msg)
+            raise Exception(error_msg)
+
 
 def run_optimization(input_data: Dict[str, Any]) -> Dict[str, Any]:
     """
