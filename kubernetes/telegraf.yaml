@@ -67,7 +67,7 @@ data:
       max_undelivered_messages = 1000
 
     [[outputs.influxdb_v2]]
-      urls = ["http://influxdb.monitoring.svc.cluster.local:8086"]
+      urls = ["http://influxdb.default.svc.cluster.local:8086"]
       token = "my-secret-token"
       organization = "my-org"
       bucket = "my-bucket"

@@ -152,7 +152,7 @@ class ICUOptimizationCrew(CrewBase):
         )
     
     
-def train(self, training_file: str, n_iterations: int = 2, model_file: str = "icu_crew_model.pkl") -> None:
+def train(self, training_file: str, n_iterations: int = 5, model_file: str = "icu_crew_model.pkl") -> None:
         """
         Train the crew using historical data and save the trained model.
         
@@ -280,4 +280,4 @@ if __name__ == "__main__":
     
     # Train crew (example)
     # crew = ICUOptimizationCrew()
-    # crew.train("historical_data.txt")
+    crew.train("historical_data.txt")

@@ -6,11 +6,11 @@ spec:
   selector:
     app: open-webui
   ports:
-    - name: http  # ✅ Added a unique name for port 3000
+    - name: http 
       protocol: TCP
       port: 3000
       targetPort: 3000
-    - name: api  # ✅ Added a unique name for port 8080
+    - name: api 
       protocol: TCP
       port: 8080
       targetPort: 8080
