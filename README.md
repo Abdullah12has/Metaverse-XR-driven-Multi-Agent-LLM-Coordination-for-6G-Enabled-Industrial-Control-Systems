@@ -4,6 +4,7 @@ A distributed Industrial Control System (ICS) simulation for conveyor systems, i
 
 [Watch the video](https://www.youtube.com/watch?v=xis7rWp-hjs&ab_channel=BuildNewThings)
 
+<video align='center' src="https://github.com/user-attachments/assets/f8161b36-8338-488e-98b2-615e3cbe146e" muted autoplay loop></video>
 
 
 ## Overview
