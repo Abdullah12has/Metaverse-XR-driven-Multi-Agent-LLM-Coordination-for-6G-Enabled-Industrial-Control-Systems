@@ -2,7 +2,7 @@
 
 A distributed Industrial Control System (ICS) simulation for conveyor systems, incorporating Raft Consensus, Kafka Message Broker, and Kubernetes-based resource management.
 
-[Watch the video](https://www.youtube.com/watch?v=xis7rWp-hjs&ab_channel=BuildNewThings)
+[Watch the video](https://youtu.be/V1IG8CwtKoQ)
 
 
 
