@@ -2,6 +2,10 @@
 
 A distributed Industrial Control System (ICS) simulation for conveyor systems, incorporating Raft Consensus, Kafka Message Broker, and Kubernetes-based resource management.
 
+[Watch the video](https://youtu.be/V1IG8CwtKoQ)
+
+
+
 ## Overview
 
 This project implements a distributed control system for simulating and managing conveyor belt operations. It demonstrates modern distributed systems architecture with real-time control capabilities.
@@ -187,3 +191,4 @@ kubectl delete services --all
 - Advanced anomaly detection
 - Real-time optimization algorithms
 - Extended monitoring and alerting
+

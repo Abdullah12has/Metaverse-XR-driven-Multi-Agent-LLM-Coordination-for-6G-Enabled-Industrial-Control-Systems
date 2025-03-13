@@ -5,7 +5,9 @@ metadata:
 spec:
   selector:
     app: crewai
+  type: NodePort  # Expose service externally
   ports:
     - protocol: TCP
       port: 5000
       targetPort: 5000
+      nodePort: 30007  # Any port between 30000-32767
