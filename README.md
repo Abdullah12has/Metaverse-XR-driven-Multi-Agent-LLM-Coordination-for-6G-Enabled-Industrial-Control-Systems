@@ -50,7 +50,7 @@ graph TD
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/conveyor-system-simulation.git
+git clone repolink
 cd conveyor-system-simulation
 ```
 
@@ -187,12 +187,3 @@ kubectl delete services --all
 - Advanced anomaly detection
 - Real-time optimization algorithms
 - Extended monitoring and alerting
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Contact
-
-Muhammad Hassan Sohail - [@LinkedIn](https://www.linkedin.com/in/mhassan-sohail/)
-Project Link: [https://github.com/hsn07pk/conveyor-system-simulation](https://github.com/hsn07pk/conveyor-system-simulation)
